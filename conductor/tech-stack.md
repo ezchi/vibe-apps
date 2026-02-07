@@ -10,7 +10,8 @@ The first application in the Vibe-Apps collection is a web-based Parallel AI Cha
 
 ## LLM Integration (Parallel Chat)
 - **Strategy:** Browser-based session leveraging.
-- **Implementation:** Due to browser security on static sites, this will be designed as a **Web Application that integrates with a companion Browser Extension** (or utilizes CORS-bypass techniques) to interact with LLM web interfaces without API keys.
+- **Implementation:** Web Application integrates with a **Companion Browser Extension** (Manifest V3) using a `window.postMessage` relay protocol.
+- **Extension Architecture:** Background Service Worker with provider-specific adapters for internal API interaction/DOM parsing.
 
 ## Styling & UI
 - **Styling Engine:** Tailwind CSS

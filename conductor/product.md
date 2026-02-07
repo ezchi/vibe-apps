@@ -10,6 +10,7 @@ To provide a unified, cross-platform interface where users can interact with mul
 
 ## Core Features
 - **Parallel Chatting:** Send a single prompt to multiple selected LLMs.
+- **Session-Based Integration:** Interact with real LLMs (ChatGPT, Gemini, Claude, DeepSeek) without API keys by leveraging active browser sessions via a companion extension.
 - **Multi-Model Display:** View responses in a responsive column-based layout.
 - **Data Export:** Export chat history as JSON for local storage or analysis.
 
