@@ -13,7 +13,8 @@
     "https://chat.deepseek.com/*"
   ],
   "background": {
-    "service_worker": "src/background/worker.js"
+    "service_worker": "src/background/worker.js",
+    "type": "module"
   },
   "content_scripts": [
     {

@@ -1,8 +1,19 @@
 // src/background/worker.js
+import { ChatGPTAdapter } from './adapters/ChatGPTAdapter.js';
+import { GeminiAdapter } from './adapters/GeminiAdapter.js';
+import { ClaudeAdapter } from './adapters/ClaudeAdapter.js';
+import { DeepSeekAdapter } from './adapters/DeepSeekAdapter.js';
 
 /**
  * Background Service Worker handles requests to LLM providers.
  */
+
+const adapters = {
+  chatgpt: new ChatGPTAdapter(),
+  gemini: new GeminiAdapter(),
+  claude: new ClaudeAdapter(),
+  deepseek: new DeepSeekAdapter()
+};
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   const { type, payload, requestId } = request;
@@ -21,17 +32,18 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
 async function handleQueryLLM(payload, sendResponse) {
   const { provider, prompt } = payload;
+  const adapter = adapters[provider.toLowerCase()];
+
+  if (!adapter) {
+    sendResponse({ success: false, error: `No adapter found for provider: ${provider}` });
+    return;
+  }
 
   try {
-    // Placeholder for actual adapter logic (to be implemented in Phase 2)
-    const response = {
-      text: `Placeholder response for ${provider}. Prompt: ${prompt}`,
-      provider: provider,
-      timestamp: new Date().toISOString()
-    };
-
+    const response = await adapter.query(prompt);
     sendResponse({ success: true, data: response });
   } catch (error) {
+    console.error(`Error querying ${provider}:`, error);
     sendResponse({ success: false, error: error.message });
   }
 }
