@@ -9,9 +9,9 @@
 - [x] Task: Create Layout component with responsive side-by-side columns 4145c1a
     - [x] Write Tests
     - [x] Implement Feature
-- [ ] Task: Create ChatInput component for sending prompts
-    - [ ] Write Tests
-    - [ ] Implement Feature
+- [x] Task: Create ChatInput component for sending prompts c715870
+    - [x] Write Tests
+    - [x] Implement Feature
 - [ ] Task: Create ModelResponseCard component for individual model output
     - [ ] Write Tests
     - [ ] Implement Feature
