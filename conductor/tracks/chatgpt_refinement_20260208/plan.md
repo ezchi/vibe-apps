@@ -17,8 +17,8 @@
 - [x] Task: Update `ExtensionService.ts` to handle `STREAM_UPDATE` message types and allow subscriptions 0ca18f8
 - [x] Task: Write Tests: Verify `ExtensionService` correctly processes and relays stream chunks 0ca18f8
 - [x] Task: Implement streaming support in `ExtensionService` 0ca18f8
-- [ ] Task: Write Tests: Verify `useChat` hook correctly updates state with partial stream content
-- [ ] Task: Refactor `useChat` to handle incremental state updates for streaming responses
+- [x] Task: Write Tests: Verify `useChat` hook correctly updates state with partial stream content b1ce693
+- [x] Task: Refactor `useChat` to handle incremental state updates for streaming responses b1ce693
 - [ ] Task: Conductor - User Manual Verification 'Phase 3: Web App Streaming Support' (Protocol in workflow.md)
 
 ## Phase 4: Reliability & Polish
