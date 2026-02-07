@@ -24,7 +24,7 @@
 - [x] Task: Implement Model Management (Add/Remove models) 28ed5ee
     - [x] Write Tests
     - [x] Implement Feature
-- [ ] Task: Implement Export to JSON functionality
-    - [ ] Write Tests
-    - [ ] Implement Feature
+- [x] Task: Implement Export to JSON functionality 5040dc3
+    - [x] Write Tests
+    - [x] Implement Feature
 - [ ] Task: Conductor - User Manual Verification 'Phase 3: Logic & Mocking' (Protocol in workflow.md)
