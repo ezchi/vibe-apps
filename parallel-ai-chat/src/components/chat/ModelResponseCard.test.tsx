@@ -15,4 +15,10 @@ describe('ModelResponseCard', () => {
     expect(screen.getByText('Gemini')).toBeInTheDocument()
     expect(screen.getByRole('status')).toBeInTheDocument()
   })
+
+  it('renders error message when error is provided', () => {
+    render(<ModelResponseCard modelName="Claude" content="" error="Please login" />)
+    expect(screen.getByText('Please login')).toBeInTheDocument()
+    expect(screen.getByText('Error')).toBeInTheDocument()
+  })
 })

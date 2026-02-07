@@ -76,6 +76,7 @@ export default function Home() {
               modelName={model}
               content={responses[model]?.content || `${model} is ready. Send a message to get started.`}
               isLoading={responses[model]?.isLoading}
+              error={responses[model]?.error}
             />
           ))}
           {activeModels.length === 0 && (
