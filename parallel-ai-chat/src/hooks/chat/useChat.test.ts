@@ -40,4 +40,16 @@ describe('useChat', () => {
     
     spy.mockRestore()
   })
+
+  it('tracks history of messages', async () => {
+    const { result } = renderHook(() => useChat())
+    
+    await act(async () => {
+      await result.current.sendMessage('Hello')
+    })
+    
+    expect(result.current.history).toHaveLength(1)
+    expect(result.current.history[0].prompt).toBe('Hello')
+    expect(result.current.history[0].responses['ChatGPT']).toBeDefined()
+  })
 })
