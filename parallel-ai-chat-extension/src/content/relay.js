@@ -24,18 +24,35 @@ window.addEventListener('message', (event) => {
 
     // Relay the message to the background service worker
     chrome.runtime.sendMessage({ type, payload, requestId }, (response) => {
-      // Send the response back to the Web Application
-      window.postMessage({
-        source: 'parallel-ai-chat-extension',
-        type: `${type}_RESPONSE`,
-        payload: response,
-        requestId
-      }, window.location.origin);
+      // Send the response back to the Web Application (for non-streaming)
+      if (response) {
+        window.postMessage({
+          source: 'parallel-ai-chat-extension',
+          type: `${type}_RESPONSE`,
+          payload: response,
+          requestId
+        }, window.location.origin);
+      }
     });
   }
 });
 
-// Notify the web app that the extension is ready (Initial broadcast)
+// Listen for messages from the Background Worker
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  const { type, payload, requestId } = request;
+
+  // Relay messages (like stream chunks) to the Web Application
+  if (type === 'STREAM_CHUNK' || type === 'STREAM_FINISHED' || type === 'STREAM_ERROR') {
+    window.postMessage({
+      source: 'parallel-ai-chat-extension',
+      type: type,
+      payload: payload,
+      requestId: requestId // May be undefined for broadcast streams
+    }, window.location.origin);
+  }
+});
+
+// Notify the web app that the extension is ready
 window.postMessage({
   source: 'parallel-ai-chat-extension',
   type: 'EXTENSION_READY'

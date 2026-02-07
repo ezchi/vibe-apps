@@ -28,15 +28,60 @@ async function handleProxyFetch(payload, sendResponse) {
       return;
     }
 
-    // For now, handling non-streaming response as a fallback or for non-streamed requests
-    if (!options.headers['Accept']?.includes('text/event-stream')) {
+    if (options.headers['Accept']?.includes('text/event-stream')) {
+      handleStreamingResponse(response, sendResponse);
+    } else {
       const data = await response.json();
       sendResponse({ success: true, data });
-    } else {
-      // Streaming will be handled in Phase 2
-      sendResponse({ success: false, error: "Streaming not yet implemented in proxy" });
     }
   } catch (error) {
     sendResponse({ success: false, error: error.message });
+  }
+}
+
+async function handleStreamingResponse(response, sendResponse) {
+  const reader = response.body.getReader();
+  const decoder = new TextDecoder();
+  let buffer = '';
+
+  try {
+    // Notify background that streaming has started
+    sendResponse({ success: true, streaming: true });
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+
+      buffer += decoder.decode(value, { stream: true });
+      const lines = buffer.split('\n');
+      buffer = lines.pop(); // Keep partial line in buffer
+
+      for (const line of lines) {
+        if (line.trim() === '') continue;
+        if (line.startsWith('data: ')) {
+          const data = line.slice(6);
+          if (data === '[DONE]') {
+            chrome.runtime.sendMessage({ type: 'STREAM_FINISHED' });
+            break;
+          }
+
+          try {
+            const parsed = JSON.parse(data);
+            const text = parsed.message?.content?.parts?.[0];
+            if (text) {
+              // Send stream chunk to background worker
+              chrome.runtime.sendMessage({ 
+                type: 'STREAM_CHUNK', 
+                payload: { text, provider: 'ChatGPT' } 
+              });
+            }
+          } catch (e) {
+            // Ignore parse errors for partial/malformed lines
+          }
+        }
+      }
+    }
+  } catch (error) {
+    chrome.runtime.sendMessage({ type: 'STREAM_ERROR', payload: error.message });
   }
 }

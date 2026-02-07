@@ -28,7 +28,26 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (type === 'PING') {
     sendResponse({ status: 'PONG' });
   }
+
+  // Relay stream messages from proxy scripts to web app scripts
+  if (type === 'STREAM_CHUNK' || type === 'STREAM_FINISHED' || type === 'STREAM_ERROR') {
+    relayToWebApp(type, payload, requestId);
+  }
 });
+
+async function relayToWebApp(type, payload, requestId) {
+  const tabs = await chrome.tabs.query({
+    url: [
+      "https://ezchi.github.io/vibe-apps/*",
+      "http://localhost:3000/*",
+      "http://127.0.0.1:3000/*"
+    ]
+  });
+
+  for (const tab of tabs) {
+    chrome.tabs.sendMessage(tab.id, { type, payload, requestId });
+  }
+}
 
 async function handleQueryLLM(payload, sendResponse) {
   const { provider, prompt } = payload;
@@ -40,7 +59,8 @@ async function handleQueryLLM(payload, sendResponse) {
   }
 
   try {
-    const response = await adapter.query(prompt);
+    const context = { ensureTab, findTabByUrl };
+    const response = await adapter.query(prompt, context);
     sendResponse({ success: true, data: response });
   } catch (error) {
     console.error(`Error querying ${provider}:`, error);
@@ -53,24 +73,31 @@ async function handleQueryLLM(payload, sendResponse) {
  */
 
 export async function findTabByUrl(urlPattern) {
+  console.log(`Searching for tab with pattern: ${urlPattern}`);
   const tabs = await chrome.tabs.query({ url: urlPattern });
+  console.log(`Found ${tabs.length} matching tabs`);
   return tabs[0];
 }
 
 export async function ensureTab(url, urlPattern) {
+  console.log(`Ensuring tab exists for: ${url}`);
   let tab = await findTabByUrl(urlPattern);
   if (!tab) {
+    console.log(`Tab not found. Creating new pinned tab for ${url}`);
     tab = await chrome.tabs.create({ url, active: false, pinned: true });
+    console.log(`Tab created with ID: ${tab.id}. Waiting for 'complete' status...`);
     // Wait for tab to load
     return new Promise((resolve) => {
       chrome.tabs.onUpdated.addListener(function listener(tabId, info) {
         if (tabId === tab.id && info.status === 'complete') {
+          console.log(`Tab ${tabId} load complete.`);
           chrome.tabs.onUpdated.removeListener(listener);
           resolve(tab);
         }
       });
     });
   }
+  console.log(`Reusing existing tab with ID: ${tab.id}`);
   return tab;
 }
 
