@@ -2,7 +2,7 @@
 
 ## Phase 1: Extension Proxy Mechanism
 - [x] Task: Create `src/content/chatgpt-proxy.js` to handle proxied fetch requests 65bdb72
-- [ ] Task: Update `manifest.json` to inject `chatgpt-proxy.js` into `chatgpt.com`
+- [x] Task: Update `manifest.json` to inject `chatgpt-proxy.js` into `chatgpt.com` 85668e6
 - [ ] Task: Implement tab discovery logic in `Background Service Worker`
 - [ ] Task: Implement automatic tab opening logic (open `chatgpt.com` if not found)
 - [ ] Task: Conductor - User Manual Verification 'Phase 1: Extension Proxy Mechanism' (Protocol in workflow.md)
