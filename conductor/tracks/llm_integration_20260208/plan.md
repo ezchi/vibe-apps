@@ -8,7 +8,7 @@
 - [x] Task: Conductor - User Manual Verification 'Phase 1: Extension Foundation' (Protocol in workflow.md) 9fc5b7a
 
 ## Phase 2: Model Adapters (Extension Side)
-- [ ] Task: Create standardized `BaseAdapter` interface for LLM interactions
+- [x] Task: Create standardized `BaseAdapter` interface for LLM interactions affa6a2
 - [ ] Task: Implement `ChatGPTAdapter` with logic for session-based requests
 - [ ] Task: Implement `GeminiAdapter` with logic for session-based requests
 - [ ] Task: Implement `ClaudeAdapter` with logic for session-based requests
