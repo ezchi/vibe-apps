@@ -68,4 +68,26 @@ describe('ExtensionService', () => {
     
     vi.useRealTimers();
   });
+
+  it('triggers stream listeners when STREAM_CHUNK is received', async () => {
+    const streamListener = vi.fn();
+    const unsubscribe = extensionService.onStreamUpdate(streamListener);
+
+    const mockChunk = {
+      text: 'Part of a message',
+      provider: 'ChatGPT'
+    };
+
+    // Simulate STREAM_CHUNK from extension
+    window.dispatchEvent(new MessageEvent('message', {
+      data: {
+        source: 'parallel-ai-chat-extension',
+        type: 'STREAM_CHUNK',
+        payload: mockChunk
+      }
+    }));
+
+    expect(streamListener).toHaveBeenCalledWith(mockChunk);
+    unsubscribe();
+  });
 });

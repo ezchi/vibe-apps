@@ -7,16 +7,24 @@ export interface ExtensionResponse {
     provider: string;
     timestamp: string;
   };
+  streaming?: boolean;
   error?: string;
 }
 
+export interface StreamChunk {
+  text: string;
+  provider: string;
+}
+
 type StatusListener = (isReady: boolean) => void;
+type StreamListener = (chunk: StreamChunk) => void;
 
 class ExtensionService {
   private static instance: ExtensionService;
   private pendingRequests: Map<string, (response: ExtensionResponse) => void> = new Map();
   private isExtensionReady: boolean = false;
   private statusListeners: Set<StatusListener> = new Set();
+  private streamListeners: Set<StreamListener> = new Set();
 
   private constructor() {
     if (typeof window !== 'undefined') {
@@ -40,6 +48,11 @@ class ExtensionService {
     return () => this.statusListeners.delete(listener);
   }
 
+  public onStreamUpdate(listener: StreamListener) {
+    this.streamListeners.add(listener);
+    return () => this.streamListeners.delete(listener);
+  }
+
   private handleMessage(event: MessageEvent) {
     if (event.data?.source === 'parallel-ai-chat-extension') {
       const { type, payload, requestId } = event.data;
@@ -52,6 +65,16 @@ class ExtensionService {
         if (!wasReady) {
           this.statusListeners.forEach(listener => listener(true));
         }
+        return;
+      }
+
+      if (type === 'STREAM_CHUNK') {
+        this.streamListeners.forEach(listener => listener(payload as StreamChunk));
+        return;
+      }
+
+      if (type === 'STREAM_FINISHED' || type === 'STREAM_ERROR') {
+        // Handle stream completion/error if needed
         return;
       }
 
