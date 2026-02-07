@@ -8,7 +8,7 @@ interface ModelResponseCardProps {
 
 export default function ModelResponseCard({ modelName, content, isLoading }: ModelResponseCardProps) {
   return (
-    <div className="flex flex-col h-full bg-white/40 dark:bg-black/40 backdrop-blur-lg rounded-2xl border border-white/20 shadow-xl overflow-hidden transition-all duration-300 hover:shadow-2xl hover:bg-white/50 dark:hover:bg-black/50">
+    <div className="flex flex-col h-full glass dark:glass-dark rounded-2xl shadow-xl overflow-hidden transition-all duration-300 hover:shadow-2xl">
       <div className="p-4 border-b border-white/10 bg-white/10 dark:bg-black/10 flex items-center justify-between">
         <h3 className="font-semibold text-slate-800 dark:text-slate-100">{modelName}</h3>
       </div>

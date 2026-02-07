@@ -23,7 +23,7 @@ export default function ChatInput({ onSend }: ChatInputProps) {
 
   return (
     <div className="w-full max-w-4xl mx-auto p-4">
-      <div className="relative flex items-end gap-2 bg-white/30 dark:bg-black/30 backdrop-blur-md rounded-2xl p-2 border border-white/20 shadow-lg">
+      <div className="relative flex items-end gap-2 glass dark:glass-dark rounded-2xl p-2 shadow-lg">
         <textarea
           className="w-full bg-transparent border-none focus:ring-0 resize-none p-3 text-slate-800 dark:text-slate-100 placeholder-slate-500 dark:placeholder-slate-400 max-h-32 focus:outline-none"
           placeholder="Type a message..."
