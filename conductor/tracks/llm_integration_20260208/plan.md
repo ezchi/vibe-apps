@@ -1,7 +1,7 @@
 # Implementation Plan: Real LLM Integration via Browser Extension
 
 ## Phase 1: Browser Extension Foundation
-- [~] Task: Create extension directory structure (parallel-ai-chat-extension)
+- [x] Task: Create extension directory structure (parallel-ai-chat-extension) b14063b
 - [ ] Task: Initialize manifest.json (v3) with necessary permissions (host_permissions)
 - [ ] Task: Implement Content Script for `window.postMessage` communication relay
 - [ ] Task: Implement Background Service Worker to receive messages from Content Script
