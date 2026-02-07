@@ -18,9 +18,9 @@
 - [x] Task: Conductor - User Manual Verification 'Phase 2: Core UI Components' (Protocol in workflow.md) e459a66
 
 ## Phase 3: Logic & Mocking
-- [ ] Task: Implement mock response logic for ChatGPT, Gemini, and DeepSeek
-    - [ ] Write Tests
-    - [ ] Implement Feature
+- [x] Task: Implement mock response logic for ChatGPT, Gemini, and DeepSeek 7dd3173
+    - [x] Write Tests
+    - [x] Implement Feature
 - [ ] Task: Implement Model Management (Add/Remove models)
     - [ ] Write Tests
     - [ ] Implement Feature
