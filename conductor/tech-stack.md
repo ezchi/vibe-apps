@@ -16,6 +16,10 @@ The first application in the Vibe-Apps collection is a web-based Parallel AI Cha
 - **Styling Engine:** Tailwind CSS
 - **Design Pattern:** Glassmorphism (backdrop-blur, transparency, vibrant utility-based gradients).
 
+## Testing
+- **Framework:** Vitest
+- **Library:** React Testing Library
+
 ## Data Persistence
 - **Storage:** IndexedDB / LocalStorage (Web-native and persistent within the user's browser).
 
