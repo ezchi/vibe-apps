@@ -12,9 +12,10 @@ export class BaseAdapter {
   /**
    * Main entry point to send a query to the LLM.
    * @param {string} prompt 
+   * @param {Object} context 
    * @returns {Promise<Object>} 
    */
-  async query(prompt) {
+  async query(prompt, context = {}) {
     throw new Error('Method "query" must be implemented by subclass');
   }
 
