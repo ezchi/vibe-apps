@@ -2,11 +2,10 @@
 
 /**
  * This script is injected into chatgpt.com.
- * It listens for messages from the extension's background worker
- * and executes fetch requests to the internal API from the page context.
+ * It uses DOM automation to input text and click send.
  */
 
-console.log('ChatGPT Proxy Content Script Loaded');
+console.log('ChatGPT DOM Automation Script Loaded');
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.type === 'PING') {
@@ -15,114 +14,75 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   }
 
   if (request.type === 'EXECUTE_PROXY_FETCH') {
-    handleProxyFetch(request.payload, sendResponse);
-    return true; // Keep channel open for async response
+    handleDomAction(request.payload, sendResponse);
+    return true; 
   }
 });
 
-async function getAccessToken() {
-  try {
-    const response = await fetch('/api/auth/session');
-    if (!response.ok) return null;
-    const data = await response.json();
-    return data.accessToken || null;
-  } catch (error) {
-    console.error('Failed to fetch session:', error);
-    return null;
-  }
-}
+async function handleDomAction(payload, sendResponse) {
+  const { options } = payload;
+  const body = JSON.parse(options.body);
+  const prompt = body.messages[0].content.parts[0];
 
-async function handleProxyFetch(payload, sendResponse) {
-  const { url, options } = payload;
-  console.log('Proxying fetch to:', url);
+  console.log('Automating prompt:', prompt);
 
   try {
-    // 1. Get fresh access token
-    const token = await getAccessToken();
-    if (!token) {
-      sendResponse({ success: false, error: 'Failed to obtain ChatGPT session token. Please ensure you are logged in.' });
-      return;
-    }
+    const textarea = document.querySelector('#prompt-textarea');
+    if (!textarea) throw new Error('Could not find prompt textarea');
 
-    // 2. Add Authorization header
-    const proxyOptions = {
-      ...options,
-      headers: {
-        ...options.headers,
-        'Authorization': `Bearer ${token}`
-      }
-    };
-
-    const response = await fetch(url, proxyOptions);
+    textarea.innerHTML = `<p>${prompt}</p>`;
+    textarea.dispatchEvent(new Event('input', { bubbles: true }));
     
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error('Fetch failed:', response.status, errorText);
-      sendResponse({ 
-        success: false, 
-        error: `Fetch failed with status ${response.status}`,
-        status: response.status 
-      });
-      return;
-    }
+    await new Promise(r => setTimeout(r, 500));
 
-    if (options.headers['Accept']?.includes('text/event-stream')) {
-      handleStreamingResponse(response, sendResponse);
-    } else {
-      const data = await response.json();
-      sendResponse({ success: true, data });
-    }
+    const sendButton = document.querySelector('[data-testid="send-button"]');
+    if (!sendButton) throw new Error('Could not find send button');
+    
+    sendButton.click();
+
+    sendResponse({ success: true, streaming: true });
+    
+    observeResponse();
+
   } catch (error) {
-    console.error('Proxy fetch error:', error);
+    console.error('DOM Automation Error:', error);
     sendResponse({ success: false, error: error.message });
   }
 }
 
-async function handleStreamingResponse(response, sendResponse) {
-  const reader = response.body.getReader();
-  const decoder = new TextDecoder();
-  let buffer = '';
+function observeResponse() {
+  let lastTextLength = 0;
+  
+  const observer = new MutationObserver(() => {
+    const messages = document.querySelectorAll('[data-message-author-role="assistant"]');
+    const lastMessage = messages[messages.length - 1];
 
-  try {
-    // Notify background that streaming has started
-    sendResponse({ success: true, streaming: true });
+    if (lastMessage) {
+      // Get text content (ignoring artifacts if possible, simplified here)
+      const currentText = lastMessage.innerText || "";
+      
+      if (currentText.length > lastTextLength) {
+        const newChunk = currentText.slice(lastTextLength);
+        lastTextLength = currentText.length;
+        
+        chrome.runtime.sendMessage({ 
+          type: 'STREAM_CHUNK', 
+          payload: { text: newChunk, provider: 'ChatGPT' } 
+        });
+      }
 
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
+      const stopButton = document.querySelector('[aria-label="Stop generating"]');
+      const isGenerating = !!stopButton;
 
-      buffer += decoder.decode(value, { stream: true });
-      const lines = buffer.split('\n');
-      buffer = lines.pop(); // Keep partial line in buffer
-
-      for (const line of lines) {
-        if (line.trim() === '') continue;
-        if (line.startsWith('data: ')) {
-          const data = line.slice(6);
-          
-          if (data.trim() === '[DONE]') {
+      if (!isGenerating && currentText.length > 0) {
+        // Wait a small moment to ensure we got everything
+        setTimeout(() => {
             chrome.runtime.sendMessage({ type: 'STREAM_FINISHED' });
-            break;
-          }
-
-          try {
-            const parsed = JSON.parse(data);
-            const text = parsed.message?.content?.parts?.[0];
-            if (text) {
-              // Send stream chunk to background worker
-              chrome.runtime.sendMessage({ 
-                type: 'STREAM_CHUNK', 
-                payload: { text, provider: 'ChatGPT' } 
-              });
-            }
-          } catch (e) {
-            // Ignore parse errors for partial/malformed lines
-          }
-        }
+            observer.disconnect();
+        }, 1000);
       }
     }
-  } catch (error) {
-    console.error('Streaming error:', error);
-    chrome.runtime.sendMessage({ type: 'STREAM_ERROR', payload: error.message });
-  }
+  });
+
+  observer.observe(document.body, { childList: true, subtree: true, characterData: true });
 }
