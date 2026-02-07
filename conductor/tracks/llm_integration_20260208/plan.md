@@ -15,13 +15,13 @@
 - [x] Task: Implement `DeepSeekAdapter` with logic for session-based requests 4b8dcfa
 - [x] Task: Conductor - User Manual Verification 'Phase 2: Model Adapters' (Protocol in workflow.md) d575322
 
-## Phase 3: Web App Communication Layer
+## Phase 3: Web App Communication Layer [checkpoint: bfcf387]
 - [x] Task: Create `ExtensionService` in `src/lib/chat/` to manage `postMessage` lifecycle f96adb9
 - [x] Task: Write Tests: Verify `ExtensionService` handles outgoing requests and incoming responses correctly f96adb9
 - [x] Task: Implement `ExtensionService` f96adb9
 - [x] Task: Write Tests: Verify `useChat` hook integrates with `ExtensionService` correctly a03ddb3
 - [x] Task: Refactor `useChat` to allow switching between `mockChatService` and `ExtensionService` a03ddb3
-- [ ] Task: Conductor - User Manual Verification 'Phase 3: Web App Communication' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 3: Web App Communication' (Protocol in workflow.md) bfcf387
 
 ## Phase 4: UI Updates & Error Handling
 - [ ] Task: Implement `ExtensionStatus` component to show if the companion extension is active
