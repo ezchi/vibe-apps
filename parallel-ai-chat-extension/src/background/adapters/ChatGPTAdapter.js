@@ -15,6 +15,9 @@ export class ChatGPTAdapter extends BaseAdapter {
       console.log(`${this.name}: Ensuring proxy tab is ready...`);
       const tab = await context.ensureTab(this.baseUrl, `${this.baseUrl}/*`);
       
+      // Small delay to ensure content script is ready
+      await new Promise(resolve => setTimeout(resolve, 500));
+
       console.log(`${this.name}: Sending proxied fetch request to tab ${tab.id}`);
       
       return new Promise((resolve, reject) => {
@@ -24,7 +27,7 @@ export class ChatGPTAdapter extends BaseAdapter {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',
-              'Accept': 'text/event-stream', // We want streaming
+              'Accept': 'text/event-stream',
             },
             body: JSON.stringify({
               action: 'next',
@@ -45,12 +48,23 @@ export class ChatGPTAdapter extends BaseAdapter {
 
         chrome.tabs.sendMessage(tab.id, { type: 'EXECUTE_PROXY_FETCH', payload }, (response) => {
           if (chrome.runtime.lastError) {
-            reject(new Error(`Failed to communicate with proxy tab: ${chrome.runtime.lastError.message}`));
+            console.warn(`${this.name}: Send message failed, retrying once...`, chrome.runtime.lastError.message);
+            // One-time retry after a longer delay
+            setTimeout(() => {
+              chrome.tabs.sendMessage(tab.id, { type: 'EXECUTE_PROXY_FETCH', payload }, (retryResponse) => {
+                if (chrome.runtime.lastError) {
+                  reject(new Error(`Failed to communicate with proxy tab: ${chrome.runtime.lastError.message}`));
+                } else if (retryResponse && retryResponse.success) {
+                  resolve(retryResponse.data);
+                } else {
+                  reject(new Error(retryResponse?.error || 'Unknown error during proxied fetch after retry'));
+                }
+              });
+            }, 1000);
             return;
           }
 
           if (response && response.success) {
-            // Non-streaming response handling (fallback)
             resolve(response.data);
           } else {
             reject(new Error(response?.error || 'Unknown error during proxied fetch'));
