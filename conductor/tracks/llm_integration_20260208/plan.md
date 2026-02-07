@@ -7,13 +7,13 @@
 - [x] Task: Implement Background Service Worker to receive messages from Content Script 4f92e98
 - [x] Task: Conductor - User Manual Verification 'Phase 1: Extension Foundation' (Protocol in workflow.md) 9fc5b7a
 
-## Phase 2: Model Adapters (Extension Side)
+## Phase 2: Model Adapters (Extension Side) [checkpoint: d575322]
 - [x] Task: Create standardized `BaseAdapter` interface for LLM interactions affa6a2
 - [x] Task: Implement `ChatGPTAdapter` with logic for session-based requests 4b8dcfa
 - [x] Task: Implement `GeminiAdapter` with logic for session-based requests 4b8dcfa
 - [x] Task: Implement `ClaudeAdapter` with logic for session-based requests 4b8dcfa
 - [x] Task: Implement `DeepSeekAdapter` with logic for session-based requests 4b8dcfa
-- [ ] Task: Conductor - User Manual Verification 'Phase 2: Model Adapters' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 2: Model Adapters' (Protocol in workflow.md) d575322
 
 ## Phase 3: Web App Communication Layer
 - [ ] Task: Create `ExtensionService` in `src/lib/chat/` to manage `postMessage` lifecycle
