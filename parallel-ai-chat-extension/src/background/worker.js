@@ -62,9 +62,12 @@ async function relayToWebApp(type, payload, requestId) {
 }
 
 async function checkAllProxies() {
-  const chatGPTTab = await findTabByUrl('https://chatgpt.com/*');
-  if (chatGPTTab) {
-    relayToWebApp('PROXY_STATUS', { provider: 'ChatGPT', ready: true });
+  console.log('Checking/Initializing all proxies...');
+  // Proactively ensure ChatGPT tab exists when status is checked
+  try {
+    await ensureTab('https://chatgpt.com', 'https://chatgpt.com/*');
+  } catch (error) {
+    console.error('Failed to initialize ChatGPT proxy tab:', error);
   }
 }
 

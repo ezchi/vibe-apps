@@ -27,21 +27,40 @@ async function handleDomAction(payload, sendResponse) {
   console.log('Automating prompt:', prompt);
 
   try {
-    const textarea = document.querySelector('#prompt-textarea');
-    if (!textarea) throw new Error('Could not find prompt textarea');
-
-    textarea.innerHTML = `<p>${prompt}</p>`;
-    textarea.dispatchEvent(new Event('input', { bubbles: true }));
+    // 1. Find Input
+    const textarea = document.querySelector('#prompt-textarea') || 
+                     document.querySelector('div[contenteditable="true"]') ||
+                     document.querySelector('textarea');
     
-    await new Promise(r => setTimeout(r, 500));
+    if (!textarea) {
+      console.log('Current URL:', window.location.href);
+      throw new Error('Could not find prompt textarea. Is the page fully loaded?');
+    }
 
-    const sendButton = document.querySelector('[data-testid="send-button"]');
+    console.log('Found input element, inserting text...');
+    
+    if (textarea.tagName === 'TEXTAREA') {
+      textarea.value = prompt;
+    } else {
+      textarea.innerHTML = `<p>${prompt}</p>`;
+    }
+    
+    textarea.dispatchEvent(new Event('input', { bubbles: true }));
+    textarea.dispatchEvent(new Event('change', { bubbles: true }));
+    
+    await new Promise(r => setTimeout(r, 1000));
+
+    // 2. Find and Click Send Button
+    const sendButton = document.querySelector('[data-testid="send-button"]') ||
+                       document.querySelector('button[aria-label="Send prompt"]') ||
+                       document.querySelector('button:has(svg)');
+    
     if (!sendButton) throw new Error('Could not find send button');
     
+    console.log('Clicking send button...');
     sendButton.click();
 
     sendResponse({ success: true, streaming: true });
-    
     observeResponse();
 
   } catch (error) {
@@ -52,13 +71,13 @@ async function handleDomAction(payload, sendResponse) {
 
 function observeResponse() {
   let lastTextLength = 0;
+  console.log('Started observing response...');
   
   const observer = new MutationObserver(() => {
     const messages = document.querySelectorAll('[data-message-author-role="assistant"]');
     const lastMessage = messages[messages.length - 1];
 
     if (lastMessage) {
-      // Get text content (ignoring artifacts if possible, simplified here)
       const currentText = lastMessage.innerText || "";
       
       if (currentText.length > lastTextLength) {
@@ -71,11 +90,11 @@ function observeResponse() {
         });
       }
 
-      const stopButton = document.querySelector('[aria-label="Stop generating"]');
+      const stopButton = document.querySelector('[aria-label="Stop generating"]') || 
+                         document.querySelector('[data-testid="stop-button"]');
       const isGenerating = !!stopButton;
 
       if (!isGenerating && currentText.length > 0) {
-        // Wait a small moment to ensure we got everything
         setTimeout(() => {
             chrome.runtime.sendMessage({ type: 'STREAM_FINISHED' });
             observer.disconnect();
