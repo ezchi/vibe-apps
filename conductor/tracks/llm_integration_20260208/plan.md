@@ -9,10 +9,10 @@
 
 ## Phase 2: Model Adapters (Extension Side)
 - [x] Task: Create standardized `BaseAdapter` interface for LLM interactions affa6a2
-- [ ] Task: Implement `ChatGPTAdapter` with logic for session-based requests
-- [ ] Task: Implement `GeminiAdapter` with logic for session-based requests
-- [ ] Task: Implement `ClaudeAdapter` with logic for session-based requests
-- [ ] Task: Implement `DeepSeekAdapter` with logic for session-based requests
+- [x] Task: Implement `ChatGPTAdapter` with logic for session-based requests 4b8dcfa
+- [x] Task: Implement `GeminiAdapter` with logic for session-based requests 4b8dcfa
+- [x] Task: Implement `ClaudeAdapter` with logic for session-based requests 4b8dcfa
+- [x] Task: Implement `DeepSeekAdapter` with logic for session-based requests 4b8dcfa
 - [ ] Task: Conductor - User Manual Verification 'Phase 2: Model Adapters' (Protocol in workflow.md)
 
 ## Phase 3: Web App Communication Layer
