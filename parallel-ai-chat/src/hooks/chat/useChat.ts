@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { getMockResponse } from '@/lib/chat/mockChatService';
 import { extensionService } from '@/lib/chat/ExtensionService';
 
@@ -17,12 +17,19 @@ export interface ChatHistoryItem {
 export const useChat = () => {
   const [activeModels, setActiveModels] = useState<string[]>(['ChatGPT', 'Gemini', 'DeepSeek']);
   const [history, setHistory] = useState<ChatHistoryItem[]>([]);
+  const [isExtensionReady, setIsExtensionReady] = useState(false);
   const [responses, setResponses] = useState<Record<string, ChatResponse>>(
     activeModels.reduce((acc, model) => ({
       ...acc,
       [model]: { content: '', isLoading: false }
     }), {})
   );
+
+  useEffect(() => {
+    return extensionService.onStatusChange((ready) => {
+      setIsExtensionReady(ready);
+    });
+  }, []);
 
   const addModel = useCallback((model: string) => {
     setActiveModels(prev => [...prev, model]);
@@ -50,8 +57,6 @@ export const useChat = () => {
       });
       return next;
     });
-
-    const isExtensionReady = extensionService.checkExtensionStatus();
 
     // Request responses from all models
     const newResponses: Record<string, string> = {};
@@ -85,7 +90,7 @@ export const useChat = () => {
       prompt: message,
       responses: newResponses
     }]);
-  }, [activeModels]);
+  }, [activeModels, isExtensionReady]);
 
   const exportHistory = useCallback(() => {
     const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(history, null, 2));
@@ -105,6 +110,6 @@ export const useChat = () => {
     removeModel,
     sendMessage,
     exportHistory,
-    isExtensionReady: extensionService.checkExtensionStatus()
+    isExtensionReady
   };
 };

@@ -10,10 +10,13 @@ export interface ExtensionResponse {
   error?: string;
 }
 
+type StatusListener = (isReady: boolean) => void;
+
 class ExtensionService {
   private static instance: ExtensionService;
   private pendingRequests: Map<string, (response: ExtensionResponse) => void> = new Map();
   private isExtensionReady: boolean = false;
+  private statusListeners: Set<StatusListener> = new Set();
 
   private constructor() {
     if (typeof window !== 'undefined') {
@@ -23,13 +26,6 @@ class ExtensionService {
     }
   }
 
-  private pingExtension() {
-    window.postMessage({
-      source: 'parallel-ai-chat-web',
-      type: 'PING_EXTENSION'
-    }, window.location.origin);
-  }
-
   public static getInstance(): ExtensionService {
     if (!ExtensionService.instance) {
       ExtensionService.instance = new ExtensionService();
@@ -37,13 +33,25 @@ class ExtensionService {
     return ExtensionService.instance;
   }
 
+  public onStatusChange(listener: StatusListener) {
+    this.statusListeners.add(listener);
+    // Call immediately with current status
+    listener(this.isExtensionReady);
+    return () => this.statusListeners.delete(listener);
+  }
+
   private handleMessage(event: MessageEvent) {
     if (event.data?.source === 'parallel-ai-chat-extension') {
       const { type, payload, requestId } = event.data;
 
       if (type === 'EXTENSION_READY') {
+        const wasReady = this.isExtensionReady;
         this.isExtensionReady = true;
         console.log('Browser Extension is ready');
+        
+        if (!wasReady) {
+          this.statusListeners.forEach(listener => listener(true));
+        }
         return;
       }
 
@@ -54,6 +62,15 @@ class ExtensionService {
           this.pendingRequests.delete(requestId);
         }
       }
+    }
+  }
+
+  public pingExtension() {
+    if (typeof window !== 'undefined') {
+      window.postMessage({
+        source: 'parallel-ai-chat-web',
+        type: 'PING_EXTENSION'
+      }, window.location.origin);
     }
   }
 

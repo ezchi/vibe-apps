@@ -7,7 +7,11 @@ import { extensionService } from '@/lib/chat/ExtensionService'
 vi.mock('@/lib/chat/ExtensionService', () => ({
   extensionService: {
     queryModel: vi.fn(),
-    checkExtensionStatus: vi.fn(() => false)
+    checkExtensionStatus: vi.fn(() => false),
+    onStatusChange: vi.fn((cb) => {
+      cb(false)
+      return () => {}
+    })
   }
 }))
 
@@ -62,7 +66,10 @@ describe('useChat', () => {
   })
 
   it('uses ExtensionService when extension is ready', async () => {
-    vi.mocked(extensionService.checkExtensionStatus).mockReturnValue(true)
+    vi.mocked(extensionService.onStatusChange).mockImplementation((cb) => {
+      cb(true)
+      return () => {}
+    })
     vi.mocked(extensionService.queryModel).mockResolvedValue({
       success: true,
       data: {
