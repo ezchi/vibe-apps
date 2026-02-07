@@ -11,6 +11,7 @@ To provide a unified, cross-platform interface where users can interact with mul
 ## Core Features
 - **Parallel Chatting:** Send a single prompt to multiple selected LLMs.
 - **Multi-Model Display:** View responses in a responsive column-based layout.
+- **Data Export:** Export chat history as JSON for local storage or analysis.
 
 ## User Experience (UX)
 - **Cross-Platform Support:** Optimized for Android (Pixel 10 Pro Fold), macOS (MacBook Pro M4), and Web (GitHub Pages).
