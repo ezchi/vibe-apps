@@ -19,8 +19,8 @@
 - [x] Task: Create `ExtensionService` in `src/lib/chat/` to manage `postMessage` lifecycle f96adb9
 - [x] Task: Write Tests: Verify `ExtensionService` handles outgoing requests and incoming responses correctly f96adb9
 - [x] Task: Implement `ExtensionService` f96adb9
-- [ ] Task: Write Tests: Verify `useChat` hook integrates with `ExtensionService` correctly
-- [ ] Task: Refactor `useChat` to allow switching between `mockChatService` and `ExtensionService`
+- [x] Task: Write Tests: Verify `useChat` hook integrates with `ExtensionService` correctly a03ddb3
+- [x] Task: Refactor `useChat` to allow switching between `mockChatService` and `ExtensionService` a03ddb3
 - [ ] Task: Conductor - User Manual Verification 'Phase 3: Web App Communication' (Protocol in workflow.md)
 
 ## Phase 4: UI Updates & Error Handling
