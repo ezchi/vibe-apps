@@ -23,8 +23,8 @@
 - [x] Task: Refactor `useChat` to allow switching between `mockChatService` and `ExtensionService` a03ddb3
 - [x] Task: Conductor - User Manual Verification 'Phase 3: Web App Communication' (Protocol in workflow.md) bfcf387
 
-## Phase 4: UI Updates & Error Handling
+## Phase 4: UI Updates & Error Handling [checkpoint: 46b8561]
 - [x] Task: Implement `ExtensionStatus` component to show if the companion extension is active 0ea1fca
 - [x] Task: Update `ModelResponseCard` to display specific error messages (e.g., "Please log in to Claude") 23b3db4
 - [x] Task: Perform end-to-end manual testing with all 4 models 23b3db4
-- [ ] Task: Conductor - User Manual Verification 'Phase 4: UI & Final Integration' (Protocol in workflow.md)
+- [x] Task: Conductor - User Manual Verification 'Phase 4: UI & Final Integration' (Protocol in workflow.md) 46b8561
