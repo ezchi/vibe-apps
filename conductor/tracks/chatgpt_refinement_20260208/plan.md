@@ -22,6 +22,7 @@
 - [x] Task: Conductor - User Manual Verification 'Phase 3: Web App Streaming Support' (Protocol in workflow.md) 575ca0e
 
 ## Phase 4: Reliability & Polish
+- [x] Task: Resolve 403 Authentication error by fetching fresh session token 1737170
 - [x] Task: Implement error handling for "Tab Closed" or "Tab Navigated" scenarios during active stream ca9950a
 - [x] Task: Add "Proxy Tab Ready" indicator to `ExtensionStatus` UI ca9950a
 - [x] Task: Perform end-to-end manual testing of the full streaming flow with ChatGPT 28fbe8a
