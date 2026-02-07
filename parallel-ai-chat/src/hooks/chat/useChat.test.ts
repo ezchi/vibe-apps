@@ -11,7 +11,8 @@ vi.mock('@/lib/chat/ExtensionService', () => ({
     onStatusChange: vi.fn((cb) => {
       cb(false)
       return () => {}
-    })
+    }),
+    onStreamUpdate: vi.fn(() => () => {})
   }
 }))
 
@@ -87,5 +88,29 @@ describe('useChat', () => {
 
     expect(extensionService.queryModel).toHaveBeenCalledWith('ChatGPT', 'Hello extension')
     expect(result.current.responses['ChatGPT'].content).toBe('Response from extension')
+  })
+
+  it('updates model content incrementally when stream chunks arrive', async () => {
+    let streamCallback: any = null;
+    vi.mocked(extensionService.onStreamUpdate).mockImplementation((cb) => {
+      streamCallback = cb;
+      return () => {};
+    });
+
+    const { result } = renderHook(() => useChat());
+
+    // Trigger sendMessage to ensure model state exists (though it's initialized by default)
+    // The useEffect will have run on mount
+    expect(streamCallback).toBeDefined();
+
+    await act(async () => {
+      streamCallback({ text: 'Hello', provider: 'ChatGPT' });
+    });
+    expect(result.current.responses['ChatGPT'].content).toBe('Hello');
+
+    await act(async () => {
+      streamCallback({ text: ' world', provider: 'ChatGPT' });
+    });
+    expect(result.current.responses['ChatGPT'].content).toBe('Hello world');
   })
 })
