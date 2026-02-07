@@ -33,6 +33,7 @@ export const useChat = () => {
     });
 
     const streamUnsubscribe = extensionService.onStreamUpdate((chunk) => {
+      console.log('useChat hook received chunk for:', chunk.provider);
       setResponses(prev => {
         if (!prev[chunk.provider]) return prev;
         return {
@@ -40,7 +41,7 @@ export const useChat = () => {
           [chunk.provider]: {
             ...prev[chunk.provider],
             content: prev[chunk.provider].content + chunk.text,
-            isLoading: false // Stream chunk means it's active and not starting anymore
+            isLoading: false
           }
         };
       });
@@ -70,7 +71,6 @@ export const useChat = () => {
   }, []);
 
   const sendMessage = useCallback(async (message: string) => {
-    // Set all active models to loading and CLEAR previous content for new stream
     setResponses(prev => {
       const next = { ...prev };
       activeModels.forEach(model => {
@@ -79,7 +79,6 @@ export const useChat = () => {
       return next;
     });
 
-    // Request responses from all models
     const newResponses: Record<string, string> = {};
     await Promise.all(
       activeModels.map(async (model) => {
@@ -87,10 +86,15 @@ export const useChat = () => {
         let error: string | undefined;
 
         if (isExtensionReady) {
+          console.log(`Sending query to ${model} via extension...`);
           const result = await extensionService.queryModel(model, message);
+          console.log(`Received initial response from ${model} extension:`, result);
+          
           if (result.success) {
-            if (result.streaming) {
-              // Content will be updated via onStreamUpdate listener
+            // Note: Handle nested data if worker wrapped it
+            const data: any = result.data;
+            if (result.streaming || data?.streaming) {
+              console.log(`${model} confirmed streaming mode.`);
               return;
             } else if (result.data) {
               content = result.data.text;
@@ -110,8 +114,6 @@ export const useChat = () => {
       })
     );
 
-    // Note: History won't perfectly capture the final streamed content here 
-    // unless we update it after streaming finishes. For now, we'll keep it simple.
     setHistory(prev => [...prev, {
       timestamp: new Date().toISOString(),
       prompt: message,

@@ -30,7 +30,6 @@ class ExtensionService {
   private constructor() {
     if (typeof window !== 'undefined') {
       window.addEventListener('message', this.handleMessage.bind(this));
-      // Proactively check if extension is already there
       this.pingExtension();
     }
   }
@@ -44,9 +43,7 @@ class ExtensionService {
 
   public onStatusChange(listener: StatusListener) {
     this.statusListeners.add(listener);
-    // Call immediately with current status
     listener(this.isExtensionReady, this.proxyReady);
-    // Request fresh status
     this.pingExtension();
     return () => this.statusListeners.delete(listener);
   }
@@ -63,8 +60,6 @@ class ExtensionService {
       if (type === 'EXTENSION_READY') {
         const wasReady = this.isExtensionReady;
         this.isExtensionReady = true;
-        console.log('Browser Extension is ready');
-        
         if (!wasReady) {
           this.statusListeners.forEach(listener => listener(true, this.proxyReady));
         }
@@ -78,12 +73,12 @@ class ExtensionService {
       }
 
       if (type === 'STREAM_CHUNK') {
+        console.log('ExtensionService received chunk:', payload);
         this.streamListeners.forEach(listener => listener(payload as StreamChunk));
         return;
       }
 
       if (type === 'STREAM_FINISHED' || type === 'STREAM_ERROR') {
-        // Handle stream completion/error if needed
         return;
       }
 
@@ -119,7 +114,6 @@ class ExtensionService {
         payload: { provider, prompt }
       }, window.location.origin);
 
-      // Timeout after 30 seconds
       setTimeout(() => {
         if (this.pendingRequests.has(requestId)) {
           this.pendingRequests.delete(requestId);
