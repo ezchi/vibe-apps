@@ -6,44 +6,59 @@ export class ChatGPTAdapter extends BaseAdapter {
     super('ChatGPT', 'https://chatgpt.com');
   }
 
-  async query(prompt) {
+  /**
+   * @param {string} prompt 
+   * @param {Object} context { ensureTab, findTabByUrl }
+   */
+  async query(prompt, context) {
     try {
-      // Note: In a real-world scenario, we would piggyback on the active session.
-      // This often involves calling an internal API endpoint like /backend-api/conversation.
-      // For this implementation, we simulate the request structure.
+      console.log(`${this.name}: Ensuring proxy tab is ready...`);
+      const tab = await context.ensureTab(this.baseUrl, `${this.baseUrl}/*`);
       
-      const response = await this.fetchWithSession(`${this.baseUrl}/backend-api/conversation`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          // Note: Other headers like 'auth-token' might be needed, 
-          // but we expect the browser session to handle cookies/tokens automatically.
-        },
-        body: JSON.stringify({
-          action: 'next',
-          messages: [{
-            id: crypto.randomUUID(),
-            author: { role: 'user' },
-            content: { content_type: 'text', parts: [prompt] },
-            metadata: {}
-          }],
-          model: 'text-davinci-002-render-sha', // Example model
-          parent_message_id: crypto.randomUUID(),
-          timezone_offset_min: -480,
-          history_and_training_disabled: false,
-          arkose_token: null,
-        })
-      });
+      console.log(`${this.name}: Sending proxied fetch request to tab ${tab.id}`);
+      
+      return new Promise((resolve, reject) => {
+        const payload = {
+          url: `${this.baseUrl}/backend-api/conversation`,
+          options: {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Accept': 'text/event-stream', // We want streaming
+            },
+            body: JSON.stringify({
+              action: 'next',
+              messages: [{
+                id: crypto.randomUUID(),
+                author: { role: 'user' },
+                content: { content_type: 'text', parts: [prompt] },
+                metadata: {}
+              }],
+              model: 'text-davinci-002-render-sha',
+              parent_message_id: crypto.randomUUID(),
+              timezone_offset_min: -480,
+              history_and_training_disabled: false,
+              arkose_token: null,
+            })
+          }
+        };
 
-      // Parsing the stream/response for ChatGPT is complex. 
-      // This is a placeholder for the parsing logic.
-      const data = await response.json();
-      return {
-        text: data.message?.content?.parts?.[0] || 'Response received but format was unexpected.',
-        provider: this.name
-      };
+        chrome.tabs.sendMessage(tab.id, { type: 'EXECUTE_PROXY_FETCH', payload }, (response) => {
+          if (chrome.runtime.lastError) {
+            reject(new Error(`Failed to communicate with proxy tab: ${chrome.runtime.lastError.message}`));
+            return;
+          }
+
+          if (response && response.success) {
+            // Non-streaming response handling (fallback)
+            resolve(response.data);
+          } else {
+            reject(new Error(response?.error || 'Unknown error during proxied fetch'));
+          }
+        });
+      });
     } catch (error) {
-      console.error(`ChatGPT Query Error:`, error);
+      console.error(`${this.name} Query Error:`, error);
       throw error;
     }
   }
