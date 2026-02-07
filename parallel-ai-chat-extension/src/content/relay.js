@@ -43,13 +43,15 @@ window.addEventListener('message', (event) => {
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   const { type, payload, requestId } = request;
 
+  console.log(`Relay script received ${type} from background, forwarding to window...`);
+
   // Relay messages (like stream chunks) to the Web Application
   if (type === 'STREAM_CHUNK' || type === 'STREAM_FINISHED' || type === 'STREAM_ERROR' || type === 'PROXY_STATUS') {
     window.postMessage({
       source: 'parallel-ai-chat-extension',
       type: type,
       payload: payload,
-      requestId: requestId // May be undefined for broadcast streams
+      requestId: requestId
     }, window.location.origin);
   }
 });

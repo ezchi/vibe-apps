@@ -43,33 +43,9 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 chrome.tabs.onRemoved.addListener((tabId) => {
   relayToWebApp('STREAM_ERROR', { 
     text: 'Proxy tab was closed. Stream interrupted.', 
-    provider: 'ChatGPT' // For now, assuming ChatGPT proxy
+    provider: 'ChatGPT' 
   });
 });
-
-async function relayToWebApp(type, payload, requestId) {
-  const tabs = await chrome.tabs.query({
-    url: [
-      "https://ezchi.github.io/vibe-apps/*",
-      "http://localhost:3000/*",
-      "http://127.0.0.1:3000/*"
-    ]
-  });
-
-  for (const tab of tabs) {
-    chrome.tabs.sendMessage(tab.id, { type, payload, requestId });
-  }
-}
-
-async function checkAllProxies() {
-  console.log('Checking/Initializing all proxies...');
-  // Proactively ensure ChatGPT tab exists when status is checked
-  try {
-    await ensureTab('https://chatgpt.com', 'https://chatgpt.com/*');
-  } catch (error) {
-    console.error('Failed to initialize ChatGPT proxy tab:', error);
-  }
-}
 
 async function handleQueryLLM(payload, sendResponse) {
   const { provider, prompt } = payload;
@@ -123,6 +99,31 @@ export async function ensureTab(url, urlPattern) {
   console.log(`Reusing existing tab with ID: ${tab.id}`);
   relayToWebApp('PROXY_STATUS', { provider: 'ChatGPT', ready: true });
   return tab;
+}
+
+async function relayToWebApp(type, payload, requestId) {
+  console.log(`Relaying ${type} to web app tabs...`);
+  const tabs = await chrome.tabs.query({
+    url: [
+      "https://ezchi.github.io/vibe-apps/*",
+      "http://localhost:3000/*",
+      "http://127.0.0.1:3000/*"
+    ]
+  });
+
+  console.log(`Found ${tabs.length} web app tabs to relay to.`);
+  for (const tab of tabs) {
+    chrome.tabs.sendMessage(tab.id, { type, payload, requestId });
+  }
+}
+
+async function checkAllProxies() {
+  console.log('Checking/Initializing all proxies...');
+  try {
+    await ensureTab('https://chatgpt.com', 'https://chatgpt.com/*');
+  } catch (error) {
+    console.error('Failed to initialize ChatGPT proxy tab:', error);
+  }
 }
 
 // Expose for debugging

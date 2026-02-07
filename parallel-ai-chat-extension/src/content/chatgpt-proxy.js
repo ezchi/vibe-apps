@@ -27,18 +27,14 @@ async function handleDomAction(payload, sendResponse) {
   console.log('Automating prompt:', prompt);
 
   try {
-    // 1. Find Input
     const textarea = document.querySelector('#prompt-textarea') || 
                      document.querySelector('div[contenteditable="true"]') ||
                      document.querySelector('textarea');
     
     if (!textarea) {
-      console.log('Current URL:', window.location.href);
-      throw new Error('Could not find prompt textarea. Is the page fully loaded?');
+      throw new Error('Could not find prompt textarea');
     }
 
-    console.log('Found input element, inserting text...');
-    
     if (textarea.tagName === 'TEXTAREA') {
       textarea.value = prompt;
     } else {
@@ -50,7 +46,6 @@ async function handleDomAction(payload, sendResponse) {
     
     await new Promise(r => setTimeout(r, 1000));
 
-    // 2. Find and Click Send Button
     const sendButton = document.querySelector('[data-testid="send-button"]') ||
                        document.querySelector('button[aria-label="Send prompt"]') ||
                        document.querySelector('button:has(svg)');
@@ -74,7 +69,8 @@ function observeResponse() {
   console.log('Started observing response...');
   
   const observer = new MutationObserver(() => {
-    const messages = document.querySelectorAll('[data-message-author-role="assistant"]');
+    // Look for assistant message containers
+    const messages = document.querySelectorAll('.markdown.prose, [data-message-author-role="assistant"]');
     const lastMessage = messages[messages.length - 1];
 
     if (lastMessage) {
@@ -84,6 +80,7 @@ function observeResponse() {
         const newChunk = currentText.slice(lastTextLength);
         lastTextLength = currentText.length;
         
+        console.log('Detected chunk, sending to background:', newChunk.slice(0, 20) + '...');
         chrome.runtime.sendMessage({ 
           type: 'STREAM_CHUNK', 
           payload: { text: newChunk, provider: 'ChatGPT' } 
@@ -95,6 +92,7 @@ function observeResponse() {
       const isGenerating = !!stopButton;
 
       if (!isGenerating && currentText.length > 0) {
+        console.log('Stream finished detected via DOM');
         setTimeout(() => {
             chrome.runtime.sendMessage({ type: 'STREAM_FINISHED' });
             observer.disconnect();
