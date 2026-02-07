@@ -4,10 +4,11 @@ import React, { useState } from 'react';
 import ChatLayout from '@/components/layout/ChatLayout';
 import ChatInput from '@/components/chat/ChatInput';
 import ModelResponseCard from '@/components/chat/ModelResponseCard';
+import { ExtensionStatus } from '@/components/layout/ExtensionStatus';
 import { useChat } from '@/hooks/chat/useChat';
 
 export default function Home() {
-  const { activeModels, responses, sendMessage, addModel, removeModel, exportHistory, history } = useChat();
+  const { activeModels, responses, sendMessage, addModel, removeModel, exportHistory, history, isExtensionReady } = useChat();
   const [isManagementOpen, setIsManagementOpen] = useState(false);
 
   const availableModels = ['ChatGPT', 'Gemini', 'DeepSeek', 'Claude', 'Mistral', 'Llama'];
@@ -16,9 +17,12 @@ export default function Home() {
     <div className="flex flex-col h-screen bg-slate-100 dark:bg-slate-900">
       {/* Header */}
       <header className="p-4 flex justify-between items-center glass dark:glass-dark z-10">
-        <h1 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-          Parallel AI Chat
-        </h1>
+        <div className="flex items-center gap-4">
+          <h1 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+            Parallel AI Chat
+          </h1>
+          <ExtensionStatus isReady={isExtensionReady} />
+        </div>
         <div className="flex gap-2">
           {history.length > 0 && (
             <button 
