@@ -19,6 +19,8 @@ window.addEventListener('message', (event) => {
         source: 'parallel-ai-chat-extension',
         type: 'EXTENSION_READY'
       }, window.location.origin);
+      
+      chrome.runtime.sendMessage({ type: 'CHECK_PROXY_STATUS' });
       return;
     }
 

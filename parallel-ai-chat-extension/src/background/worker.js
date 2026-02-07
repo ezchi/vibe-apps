@@ -29,6 +29,10 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     sendResponse({ status: 'PONG' });
   }
 
+  if (type === 'CHECK_PROXY_STATUS') {
+    checkAllProxies();
+  }
+
   // Relay stream messages from proxy scripts to web app scripts
   if (type === 'STREAM_CHUNK' || type === 'STREAM_FINISHED' || type === 'STREAM_ERROR') {
     relayToWebApp(type, payload, requestId);
@@ -54,6 +58,13 @@ async function relayToWebApp(type, payload, requestId) {
 
   for (const tab of tabs) {
     chrome.tabs.sendMessage(tab.id, { type, payload, requestId });
+  }
+}
+
+async function checkAllProxies() {
+  const chatGPTTab = await findTabByUrl('https://chatgpt.com/*');
+  if (chatGPTTab) {
+    relayToWebApp('PROXY_STATUS', { provider: 'ChatGPT', ready: true });
   }
 }
 

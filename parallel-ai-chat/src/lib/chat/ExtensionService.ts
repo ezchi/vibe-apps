@@ -46,6 +46,8 @@ class ExtensionService {
     this.statusListeners.add(listener);
     // Call immediately with current status
     listener(this.isExtensionReady, this.proxyReady);
+    // Request fresh status
+    this.pingExtension();
     return () => this.statusListeners.delete(listener);
   }
 
