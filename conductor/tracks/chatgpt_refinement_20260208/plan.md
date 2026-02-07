@@ -22,7 +22,7 @@
 - [x] Task: Conductor - User Manual Verification 'Phase 3: Web App Streaming Support' (Protocol in workflow.md) 575ca0e
 
 ## Phase 4: Reliability & Polish
-- [~] Task: Implement error handling for "Tab Closed" or "Tab Navigated" scenarios during active stream
-- [~] Task: Add "Proxy Tab Ready" indicator to `ExtensionStatus` UI
+- [x] Task: Implement error handling for "Tab Closed" or "Tab Navigated" scenarios during active stream ca9950a
+- [x] Task: Add "Proxy Tab Ready" indicator to `ExtensionStatus` UI ca9950a
 - [ ] Task: Perform end-to-end manual testing of the full streaming flow with ChatGPT
 - [ ] Task: Conductor - User Manual Verification 'Phase 4: Reliability & Polish' (Protocol in workflow.md)
