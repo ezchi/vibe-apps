@@ -1,0 +1,34 @@
+{
+  "manifest_version": 3,
+  "name": "Parallel AI Chat Companion",
+  "version": "1.0.0",
+  "description": "Companion extension for Parallel AI Chat to enable session-based LLM interactions.",
+  "permissions": [
+    "storage"
+  ],
+  "host_permissions": [
+    "https://chatgpt.com/*",
+    "https://gemini.google.com/*",
+    "https://claude.ai/*",
+    "https://chat.deepseek.com/*"
+  ],
+  "background": {
+    "service_worker": "src/background/worker.js"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://ezchi.github.io/vibe-apps/*",
+        "http://localhost:3000/*"
+      ],
+      "js": [
+        "src/content/relay.js"
+      ],
+      "run_at": "document_start"
+    }
+  ],
+  "icons": {
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  }
+}
