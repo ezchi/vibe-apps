@@ -73,3 +73,7 @@ export async function ensureTab(url, urlPattern) {
   }
   return tab;
 }
+
+// Expose for debugging
+self.ensureTab = ensureTab;
+self.findTabByUrl = findTabByUrl;
