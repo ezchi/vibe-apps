@@ -12,9 +12,9 @@
 - [x] Task: Create ChatInput component for sending prompts c715870
     - [x] Write Tests
     - [x] Implement Feature
-- [ ] Task: Create ModelResponseCard component for individual model output
-    - [ ] Write Tests
-    - [ ] Implement Feature
+- [x] Task: Create ModelResponseCard component for individual model output 584e910
+    - [x] Write Tests
+    - [x] Implement Feature
 - [ ] Task: Conductor - User Manual Verification 'Phase 2: Core UI Components' (Protocol in workflow.md)
 
 ## Phase 3: Logic & Mocking
