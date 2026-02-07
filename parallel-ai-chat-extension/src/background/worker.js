@@ -47,3 +47,29 @@ async function handleQueryLLM(payload, sendResponse) {
     sendResponse({ success: false, error: error.message });
   }
 }
+
+/**
+ * Tab Management Helpers
+ */
+
+export async function findTabByUrl(urlPattern) {
+  const tabs = await chrome.tabs.query({ url: urlPattern });
+  return tabs[0];
+}
+
+export async function ensureTab(url, urlPattern) {
+  let tab = await findTabByUrl(urlPattern);
+  if (!tab) {
+    tab = await chrome.tabs.create({ url, active: false, pinned: true });
+    // Wait for tab to load
+    return new Promise((resolve) => {
+      chrome.tabs.onUpdated.addListener(function listener(tabId, info) {
+        if (tabId === tab.id && info.status === 'complete') {
+          chrome.tabs.onUpdated.removeListener(listener);
+          resolve(tab);
+        }
+      });
+    });
+  }
+  return tab;
+}
