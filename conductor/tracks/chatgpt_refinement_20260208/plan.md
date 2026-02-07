@@ -23,6 +23,7 @@
 
 ## Phase 4: Reliability & Polish
 - [x] Task: Resolve 403 Authentication error by fetching fresh session token 1737170
+- [x] Task: Refactor `chatgpt-proxy.js` to use DOM automation (Input & Click) instead of fetch 3d30edd
 - [x] Task: Implement error handling for "Tab Closed" or "Tab Navigated" scenarios during active stream ca9950a
 - [x] Task: Add "Proxy Tab Ready" indicator to `ExtensionStatus` UI ca9950a
 - [x] Task: Perform end-to-end manual testing of the full streaming flow with ChatGPT 28fbe8a
