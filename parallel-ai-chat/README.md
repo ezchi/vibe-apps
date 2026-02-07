@@ -20,6 +20,16 @@ You can start editing the page by modifying `app/page.tsx`. The page auto-update
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
+## Browser Extension Setup
+
+This application requires a companion browser extension to interact with LLM interfaces securely without API keys.
+
+1.  Open Chrome (or any Chromium-based browser) and navigate to `chrome://extensions/`.
+2.  Enable **Developer mode** in the top right corner.
+3.  Click **Load unpacked**.
+4.  Select the `parallel-ai-chat-extension` folder located at the root of this repository.
+5.  **Important:** Ensure you are logged into [ChatGPT](https://chatgpt.com) in your browser. The extension will automatically open a pinned ChatGPT tab to facilitate the connection.
+
 ## Learn More
 
 To learn more about Next.js, take a look at the following resources:
