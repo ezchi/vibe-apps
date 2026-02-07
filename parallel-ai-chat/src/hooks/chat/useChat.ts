@@ -18,6 +18,7 @@ export const useChat = () => {
   const [activeModels, setActiveModels] = useState<string[]>(['ChatGPT', 'Gemini', 'DeepSeek']);
   const [history, setHistory] = useState<ChatHistoryItem[]>([]);
   const [isExtensionReady, setIsExtensionReady] = useState(false);
+  const [proxyReady, setProxyReady] = useState<Record<string, boolean>>({});
   const [responses, setResponses] = useState<Record<string, ChatResponse>>(
     activeModels.reduce((acc, model) => ({
       ...acc,
@@ -26,8 +27,9 @@ export const useChat = () => {
   );
 
   useEffect(() => {
-    const statusUnsubscribe = extensionService.onStatusChange((ready) => {
+    const statusUnsubscribe = extensionService.onStatusChange((ready, proxies) => {
       setIsExtensionReady(ready);
+      if (proxies) setProxyReady({ ...proxies });
     });
 
     const streamUnsubscribe = extensionService.onStreamUpdate((chunk) => {
@@ -135,6 +137,7 @@ export const useChat = () => {
     removeModel,
     sendMessage,
     exportHistory,
-    isExtensionReady
+    isExtensionReady,
+    proxyReady
   };
 };

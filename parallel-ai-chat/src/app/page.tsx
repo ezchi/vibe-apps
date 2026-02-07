@@ -8,7 +8,7 @@ import { ExtensionStatus } from '@/components/layout/ExtensionStatus';
 import { useChat } from '@/hooks/chat/useChat';
 
 export default function Home() {
-  const { activeModels, responses, sendMessage, addModel, removeModel, exportHistory, history, isExtensionReady } = useChat();
+  const { activeModels, responses, sendMessage, addModel, removeModel, exportHistory, history, isExtensionReady, proxyReady } = useChat();
   const [isManagementOpen, setIsManagementOpen] = useState(false);
 
   const availableModels = ['ChatGPT', 'Gemini', 'DeepSeek', 'Claude', 'Mistral', 'Llama'];
@@ -21,7 +21,7 @@ export default function Home() {
           <h1 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
             Parallel AI Chat
           </h1>
-          <ExtensionStatus isReady={isExtensionReady} />
+          <ExtensionStatus isReady={isExtensionReady} proxyReady={proxyReady} />
         </div>
         <div className="flex gap-2">
           {history.length > 0 && (

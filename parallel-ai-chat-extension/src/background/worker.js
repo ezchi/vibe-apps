@@ -35,6 +35,14 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   }
 });
 
+// Notify web app if a proxy tab is closed
+chrome.tabs.onRemoved.addListener((tabId) => {
+  relayToWebApp('STREAM_ERROR', { 
+    text: 'Proxy tab was closed. Stream interrupted.', 
+    provider: 'ChatGPT' // For now, assuming ChatGPT proxy
+  });
+});
+
 async function relayToWebApp(type, payload, requestId) {
   const tabs = await chrome.tabs.query({
     url: [
@@ -87,7 +95,7 @@ export async function ensureTab(url, urlPattern) {
     tab = await chrome.tabs.create({ url, active: false, pinned: true });
     console.log(`Tab created with ID: ${tab.id}. Waiting for 'complete' status...`);
     // Wait for tab to load
-    return new Promise((resolve) => {
+    await new Promise((resolve) => {
       chrome.tabs.onUpdated.addListener(function listener(tabId, info) {
         if (tabId === tab.id && info.status === 'complete') {
           console.log(`Tab ${tabId} load complete.`);
@@ -97,7 +105,9 @@ export async function ensureTab(url, urlPattern) {
       });
     });
   }
+  
   console.log(`Reusing existing tab with ID: ${tab.id}`);
+  relayToWebApp('PROXY_STATUS', { provider: 'ChatGPT', ready: true });
   return tab;
 }
 

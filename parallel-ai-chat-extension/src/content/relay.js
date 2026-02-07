@@ -42,7 +42,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   const { type, payload, requestId } = request;
 
   // Relay messages (like stream chunks) to the Web Application
-  if (type === 'STREAM_CHUNK' || type === 'STREAM_FINISHED' || type === 'STREAM_ERROR') {
+  if (type === 'STREAM_CHUNK' || type === 'STREAM_FINISHED' || type === 'STREAM_ERROR' || type === 'PROXY_STATUS') {
     window.postMessage({
       source: 'parallel-ai-chat-extension',
       type: type,

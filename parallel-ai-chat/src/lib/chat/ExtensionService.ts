@@ -16,13 +16,14 @@ export interface StreamChunk {
   provider: string;
 }
 
-type StatusListener = (isReady: boolean) => void;
+type StatusListener = (isReady: boolean, proxyReady?: Record<string, boolean>) => void;
 type StreamListener = (chunk: StreamChunk) => void;
 
 class ExtensionService {
   private static instance: ExtensionService;
   private pendingRequests: Map<string, (response: ExtensionResponse) => void> = new Map();
   private isExtensionReady: boolean = false;
+  private proxyReady: Record<string, boolean> = {};
   private statusListeners: Set<StatusListener> = new Set();
   private streamListeners: Set<StreamListener> = new Set();
 
@@ -44,7 +45,7 @@ class ExtensionService {
   public onStatusChange(listener: StatusListener) {
     this.statusListeners.add(listener);
     // Call immediately with current status
-    listener(this.isExtensionReady);
+    listener(this.isExtensionReady, this.proxyReady);
     return () => this.statusListeners.delete(listener);
   }
 
@@ -63,8 +64,14 @@ class ExtensionService {
         console.log('Browser Extension is ready');
         
         if (!wasReady) {
-          this.statusListeners.forEach(listener => listener(true));
+          this.statusListeners.forEach(listener => listener(true, this.proxyReady));
         }
+        return;
+      }
+
+      if (type === 'PROXY_STATUS') {
+        this.proxyReady[payload.provider] = payload.ready;
+        this.statusListeners.forEach(listener => listener(this.isExtensionReady, this.proxyReady));
         return;
       }
 
