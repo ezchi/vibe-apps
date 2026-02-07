@@ -4,7 +4,8 @@
   "version": "1.0.0",
   "description": "Companion extension for Parallel AI Chat to enable session-based LLM interactions.",
   "permissions": [
-    "storage"
+    "storage",
+    "tabs"
   ],
   "host_permissions": [
     "https://chatgpt.com/*",
@@ -25,6 +26,15 @@
       ],
       "js": [
         "src/content/relay.js"
+      ],
+      "run_at": "document_start"
+    },
+    {
+      "matches": [
+        "https://chatgpt.com/*"
+      ],
+      "js": [
+        "src/content/chatgpt-proxy.js"
       ],
       "run_at": "document_start"
     }
