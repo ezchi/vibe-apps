@@ -2,6 +2,14 @@ import { renderHook, act, waitFor } from '@testing-library/react'
 import { describe, it, expect, vi } from 'vitest'
 import { useChat } from './useChat'
 import * as mockService from '@/lib/chat/mockChatService'
+import { extensionService } from '@/lib/chat/ExtensionService'
+
+vi.mock('@/lib/chat/ExtensionService', () => ({
+  extensionService: {
+    queryModel: vi.fn(),
+    checkExtensionStatus: vi.fn(() => false)
+  }
+}))
 
 describe('useChat', () => {
   it('starts with default models', () => {
@@ -51,5 +59,26 @@ describe('useChat', () => {
     expect(result.current.history).toHaveLength(1)
     expect(result.current.history[0].prompt).toBe('Hello')
     expect(result.current.history[0].responses['ChatGPT']).toBeDefined()
+  })
+
+  it('uses ExtensionService when extension is ready', async () => {
+    vi.mocked(extensionService.checkExtensionStatus).mockReturnValue(true)
+    vi.mocked(extensionService.queryModel).mockResolvedValue({
+      success: true,
+      data: {
+        text: 'Response from extension',
+        provider: 'ChatGPT',
+        timestamp: new Date().toISOString()
+      }
+    })
+
+    const { result } = renderHook(() => useChat())
+    
+    await act(async () => {
+      await result.current.sendMessage('Hello extension')
+    })
+
+    expect(extensionService.queryModel).toHaveBeenCalledWith('ChatGPT', 'Hello extension')
+    expect(result.current.responses['ChatGPT'].content).toBe('Response from extension')
   })
 })

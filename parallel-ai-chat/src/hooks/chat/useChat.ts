@@ -1,9 +1,11 @@
 import { useState, useCallback } from 'react';
 import { getMockResponse } from '@/lib/chat/mockChatService';
+import { extensionService } from '@/lib/chat/ExtensionService';
 
 export interface ChatResponse {
   content: string;
   isLoading: boolean;
+  error?: string;
 }
 
 export interface ChatHistoryItem {
@@ -44,20 +46,36 @@ export const useChat = () => {
     setResponses(prev => {
       const next = { ...prev };
       activeModels.forEach(model => {
-        next[model] = { ...next[model], isLoading: true };
+        next[model] = { ...next[model], isLoading: true, error: undefined };
       });
       return next;
     });
+
+    const isExtensionReady = extensionService.checkExtensionStatus();
 
     // Request responses from all models
     const newResponses: Record<string, string> = {};
     await Promise.all(
       activeModels.map(async (model) => {
-        const content = await getMockResponse(model, message);
+        let content: string;
+        let error: string | undefined;
+
+        if (isExtensionReady) {
+          const result = await extensionService.queryModel(model, message);
+          if (result.success && result.data) {
+            content = result.data.text;
+          } else {
+            content = '';
+            error = result.error || 'Failed to get response from extension';
+          }
+        } else {
+          content = await getMockResponse(model, message);
+        }
+
         newResponses[model] = content;
         setResponses(prev => ({
           ...prev,
-          [model]: { content, isLoading: false }
+          [model]: { content, isLoading: false, error }
         }));
       })
     );
@@ -86,6 +104,7 @@ export const useChat = () => {
     addModel,
     removeModel,
     sendMessage,
-    exportHistory
+    exportHistory,
+    isExtensionReady: extensionService.checkExtensionStatus()
   };
 };
