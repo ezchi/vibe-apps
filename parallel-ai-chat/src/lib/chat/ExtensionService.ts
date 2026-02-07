@@ -18,7 +18,16 @@ class ExtensionService {
   private constructor() {
     if (typeof window !== 'undefined') {
       window.addEventListener('message', this.handleMessage.bind(this));
+      // Proactively check if extension is already there
+      this.pingExtension();
     }
+  }
+
+  private pingExtension() {
+    window.postMessage({
+      source: 'parallel-ai-chat-web',
+      type: 'PING_EXTENSION'
+    }, window.location.origin);
   }
 
   public static getInstance(): ExtensionService {

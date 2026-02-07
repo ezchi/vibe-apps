@@ -14,6 +14,14 @@ window.addEventListener('message', (event) => {
   if (event.data && event.data.source === 'parallel-ai-chat-web') {
     const { type, payload, requestId } = event.data;
 
+    if (type === 'PING_EXTENSION') {
+      window.postMessage({
+        source: 'parallel-ai-chat-extension',
+        type: 'EXTENSION_READY'
+      }, window.location.origin);
+      return;
+    }
+
     // Relay the message to the background service worker
     chrome.runtime.sendMessage({ type, payload, requestId }, (response) => {
       // Send the response back to the Web Application
@@ -27,7 +35,7 @@ window.addEventListener('message', (event) => {
   }
 });
 
-// Notify the web app that the extension is ready
+// Notify the web app that the extension is ready (Initial broadcast)
 window.postMessage({
   source: 'parallel-ai-chat-extension',
   type: 'EXTENSION_READY'
