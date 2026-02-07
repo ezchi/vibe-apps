@@ -3,7 +3,7 @@
 ## Phase 1: Browser Extension Foundation
 - [x] Task: Create extension directory structure (parallel-ai-chat-extension) b14063b
 - [x] Task: Initialize manifest.json (v3) with necessary permissions (host_permissions) 2147a8c
-- [ ] Task: Implement Content Script for `window.postMessage` communication relay
+- [x] Task: Implement Content Script for `window.postMessage` communication relay c88176f
 - [ ] Task: Implement Background Service Worker to receive messages from Content Script
 - [ ] Task: Conductor - User Manual Verification 'Phase 1: Extension Foundation' (Protocol in workflow.md)
 
