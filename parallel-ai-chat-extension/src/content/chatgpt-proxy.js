@@ -20,12 +20,40 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   }
 });
 
+async function getAccessToken() {
+  try {
+    const response = await fetch('/api/auth/session');
+    if (!response.ok) return null;
+    const data = await response.json();
+    return data.accessToken || null;
+  } catch (error) {
+    console.error('Failed to fetch session:', error);
+    return null;
+  }
+}
+
 async function handleProxyFetch(payload, sendResponse) {
   const { url, options } = payload;
   console.log('Proxying fetch to:', url);
 
   try {
-    const response = await fetch(url, options);
+    // 1. Get fresh access token
+    const token = await getAccessToken();
+    if (!token) {
+      sendResponse({ success: false, error: 'Failed to obtain ChatGPT session token. Please ensure you are logged in.' });
+      return;
+    }
+
+    // 2. Add Authorization header
+    const proxyOptions = {
+      ...options,
+      headers: {
+        ...options.headers,
+        'Authorization': `Bearer ${token}`
+      }
+    };
+
+    const response = await fetch(url, proxyOptions);
     
     if (!response.ok) {
       const errorText = await response.text();
@@ -71,7 +99,8 @@ async function handleStreamingResponse(response, sendResponse) {
         if (line.trim() === '') continue;
         if (line.startsWith('data: ')) {
           const data = line.slice(6);
-          if (data === '[DONE]') {
+          
+          if (data.trim() === '[DONE]') {
             chrome.runtime.sendMessage({ type: 'STREAM_FINISHED' });
             break;
           }
