@@ -21,9 +21,9 @@
 - [x] Task: Implement mock response logic for ChatGPT, Gemini, and DeepSeek 7dd3173
     - [x] Write Tests
     - [x] Implement Feature
-- [ ] Task: Implement Model Management (Add/Remove models)
-    - [ ] Write Tests
-    - [ ] Implement Feature
+- [x] Task: Implement Model Management (Add/Remove models) 28ed5ee
+    - [x] Write Tests
+    - [x] Implement Feature
 - [ ] Task: Implement Export to JSON functionality
     - [ ] Write Tests
     - [ ] Implement Feature
