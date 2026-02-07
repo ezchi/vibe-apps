@@ -25,6 +25,6 @@
 
 ## Phase 4: UI Updates & Error Handling
 - [x] Task: Implement `ExtensionStatus` component to show if the companion extension is active 0ea1fca
-- [ ] Task: Update `ModelResponseCard` to display specific error messages (e.g., "Please log in to Claude")
+- [x] Task: Update `ModelResponseCard` to display specific error messages (e.g., "Please log in to Claude") 23b3db4
 - [ ] Task: Perform end-to-end manual testing with all 4 models
 - [ ] Task: Conductor - User Manual Verification 'Phase 4: UI & Final Integration' (Protocol in workflow.md)
