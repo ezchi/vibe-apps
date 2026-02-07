@@ -15,8 +15,8 @@ export class ChatGPTAdapter extends BaseAdapter {
       console.log(`${this.name}: Ensuring proxy tab is ready...`);
       const tab = await context.ensureTab(this.baseUrl, `${this.baseUrl}/*`);
       
-      // Small delay to ensure content script is ready
-      await new Promise(resolve => setTimeout(resolve, 500));
+      // Wait for content script to be ready by pinging it
+      await this.waitForContentScript(tab.id);
 
       console.log(`${this.name}: Sending proxied fetch request to tab ${tab.id}`);
       
@@ -48,19 +48,7 @@ export class ChatGPTAdapter extends BaseAdapter {
 
         chrome.tabs.sendMessage(tab.id, { type: 'EXECUTE_PROXY_FETCH', payload }, (response) => {
           if (chrome.runtime.lastError) {
-            console.warn(`${this.name}: Send message failed, retrying once...`, chrome.runtime.lastError.message);
-            // One-time retry after a longer delay
-            setTimeout(() => {
-              chrome.tabs.sendMessage(tab.id, { type: 'EXECUTE_PROXY_FETCH', payload }, (retryResponse) => {
-                if (chrome.runtime.lastError) {
-                  reject(new Error(`Failed to communicate with proxy tab: ${chrome.runtime.lastError.message}`));
-                } else if (retryResponse && retryResponse.success) {
-                  resolve(retryResponse.data);
-                } else {
-                  reject(new Error(retryResponse?.error || 'Unknown error during proxied fetch after retry'));
-                }
-              });
-            }, 1000);
+            reject(new Error(`Failed to communicate with proxy tab: ${chrome.runtime.lastError.message}`));
             return;
           }
 
@@ -75,5 +63,26 @@ export class ChatGPTAdapter extends BaseAdapter {
       console.error(`${this.name} Query Error:`, error);
       throw error;
     }
+  }
+
+  async waitForContentScript(tabId, retries = 10) {
+    for (let i = 0; i < retries; i++) {
+      try {
+        const response = await new Promise((resolve, reject) => {
+          chrome.tabs.sendMessage(tabId, { type: 'PING' }, (resp) => {
+            if (chrome.runtime.lastError) reject(chrome.runtime.lastError);
+            else resolve(resp);
+          });
+        });
+        if (response?.status === 'PONG') {
+          console.log(`${this.name}: Content script is ready.`);
+          return true;
+        }
+      } catch (e) {
+        console.log(`${this.name}: Waiting for content script... (attempt ${i + 1}/${retries})`);
+        await new Promise(resolve => setTimeout(resolve, 500));
+      }
+    }
+    throw new Error('Content script failed to respond after multiple retries.');
   }
 }

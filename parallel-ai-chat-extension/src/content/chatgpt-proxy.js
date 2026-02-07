@@ -6,7 +6,14 @@
  * and executes fetch requests to the internal API from the page context.
  */
 
+console.log('ChatGPT Proxy Content Script Loaded');
+
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  if (request.type === 'PING') {
+    sendResponse({ status: 'PONG' });
+    return;
+  }
+
   if (request.type === 'EXECUTE_PROXY_FETCH') {
     handleProxyFetch(request.payload, sendResponse);
     return true; // Keep channel open for async response
@@ -15,11 +22,14 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
 async function handleProxyFetch(payload, sendResponse) {
   const { url, options } = payload;
+  console.log('Proxying fetch to:', url);
 
   try {
     const response = await fetch(url, options);
     
     if (!response.ok) {
+      const errorText = await response.text();
+      console.error('Fetch failed:', response.status, errorText);
       sendResponse({ 
         success: false, 
         error: `Fetch failed with status ${response.status}`,
@@ -35,6 +45,7 @@ async function handleProxyFetch(payload, sendResponse) {
       sendResponse({ success: true, data });
     }
   } catch (error) {
+    console.error('Proxy fetch error:', error);
     sendResponse({ success: false, error: error.message });
   }
 }
@@ -82,6 +93,7 @@ async function handleStreamingResponse(response, sendResponse) {
       }
     }
   } catch (error) {
+    console.error('Streaming error:', error);
     chrome.runtime.sendMessage({ type: 'STREAM_ERROR', payload: error.message });
   }
 }
