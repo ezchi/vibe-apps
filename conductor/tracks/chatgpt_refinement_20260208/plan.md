@@ -24,5 +24,5 @@
 ## Phase 4: Reliability & Polish
 - [x] Task: Implement error handling for "Tab Closed" or "Tab Navigated" scenarios during active stream ca9950a
 - [x] Task: Add "Proxy Tab Ready" indicator to `ExtensionStatus` UI ca9950a
-- [~] Task: Perform end-to-end manual testing of the full streaming flow with ChatGPT
+- [x] Task: Perform end-to-end manual testing of the full streaming flow with ChatGPT 28fbe8a
 - [ ] Task: Conductor - User Manual Verification 'Phase 4: Reliability & Polish' (Protocol in workflow.md)
