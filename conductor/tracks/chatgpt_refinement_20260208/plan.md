@@ -9,8 +9,8 @@
 
 ## Phase 2: ChatGPT Adapter Refinement
 - [x] Task: Refactor `ChatGPTAdapter.js` to send messages to the proxy tab instead of direct `fetch` 82522f7
-- [ ] Task: Implement SSE (Server-Sent Events) stream parsing in `chatgpt-proxy.js`
-- [ ] Task: Implement message relay for stream chunks: `Proxy` -> `Background` -> `Relay`
+- [x] Task: Implement SSE (Server-Sent Events) stream parsing in `chatgpt-proxy.js` e8dd23a
+- [x] Task: Implement message relay for stream chunks: `Proxy` -> `Background` -> `Relay` e8dd23a
 - [ ] Task: Conductor - User Manual Verification 'Phase 2: ChatGPT Adapter Refinement' (Protocol in workflow.md)
 
 ## Phase 3: Web App Streaming Support
