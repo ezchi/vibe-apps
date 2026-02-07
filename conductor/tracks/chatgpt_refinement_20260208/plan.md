@@ -8,7 +8,7 @@
 - [x] Task: Conductor - User Manual Verification 'Phase 1: Extension Proxy Mechanism' (Protocol in workflow.md) c894529
 
 ## Phase 2: ChatGPT Adapter Refinement
-- [ ] Task: Refactor `ChatGPTAdapter.js` to send messages to the proxy tab instead of direct `fetch`
+- [x] Task: Refactor `ChatGPTAdapter.js` to send messages to the proxy tab instead of direct `fetch` 82522f7
 - [ ] Task: Implement SSE (Server-Sent Events) stream parsing in `chatgpt-proxy.js`
 - [ ] Task: Implement message relay for stream chunks: `Proxy` -> `Background` -> `Relay`
 - [ ] Task: Conductor - User Manual Verification 'Phase 2: ChatGPT Adapter Refinement' (Protocol in workflow.md)
