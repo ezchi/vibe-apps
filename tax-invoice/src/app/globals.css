@@ -1,0 +1,15 @@
+@import "tailwindcss";
+
+:root {
+  --color-navy: #2B7A78;
+  --color-navy-light: #3A9B97;
+  --color-blue-accent: #2563eb;
+  --color-row-even: #f0f4f8;
+  --color-row-odd: #ffffff;
+}
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+}
